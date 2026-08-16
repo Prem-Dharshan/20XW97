@@ -1,7 +1,6 @@
 import cv2 as cv
 import numpy as np
 
-
 img = cv.imread("../images/lenna.png", 0)
 
 height, width = img.shape
@@ -9,60 +8,30 @@ height, width = img.shape
 
 # SOBEL
 
-sobel_x = np.array([
-    [-1, 0, 1],
-    [-2, 0, 2],
-    [-1, 0, 1]
-])
+sobel_x = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
 
-sobel_y = np.array([
-    [-1, -2, -1],
-    [ 0,  0,  0],
-    [ 1,  2,  1]
-])
+sobel_y = np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]])
 
 
 # PREWITT
 
-prewitt_x = np.array([
-    [-1, 0, 1],
-    [-1, 0, 1],
-    [-1, 0, 1]
-])
+prewitt_x = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
 
-prewitt_y = np.array([
-    [-1, -1, -1],
-    [ 0,  0,  0],
-    [ 1,  1,  1]
-])
+prewitt_y = np.array([[-1, -1, -1], [0, 0, 0], [1, 1, 1]])
 
 
 # ROBERTS
 
-roberts_x = np.array([
-    [1, 0],
-    [0, -1]
-])
+roberts_x = np.array([[1, 0], [0, -1]])
 
-roberts_y = np.array([
-    [0, 1],
-    [-1, 0]
-])
+roberts_y = np.array([[0, 1], [-1, 0]])
 
 
 # LAPLACIAN
 
-laplacian_4 = np.array([
-    [0,  1, 0],
-    [1, -4, 1],
-    [0,  1, 0]
-])
+laplacian_4 = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]])
 
-laplacian_8 = np.array([
-    [1,  1, 1],
-    [1, -8, 1],
-    [1,  1, 1]
-])
+laplacian_8 = np.array([[1, 1, 1], [1, -8, 1], [1, 1, 1]])
 
 
 def apply_3x3(img, kernel_x, kernel_y=None):
@@ -74,7 +43,7 @@ def apply_3x3(img, kernel_x, kernel_y=None):
     for i in range(1, height - 1):
         for j in range(1, width - 1):
 
-            mask = img[i-1:i+2, j-1:j+2]
+            mask = img[i - 1 : i + 2, j - 1 : j + 2]
 
             if kernel_y is None:
 
@@ -91,9 +60,7 @@ def apply_3x3(img, kernel_x, kernel_y=None):
 
     magnitude = np.abs(result)
 
-    magnitude = cv.normalize(
-        magnitude, None, 0, 255, cv.NORM_MINMAX
-    )
+    magnitude = cv.normalize(magnitude, None, 0, 255, cv.NORM_MINMAX)
 
     return magnitude.astype(np.uint8)
 
@@ -108,16 +75,14 @@ def apply_2x2(img, kernel_x, kernel_y):
     for i in range(height - 1):
         for j in range(width - 1):
 
-            mask = img[i:i+2, j:j+2]
+            mask = img[i : i + 2, j : j + 2]
 
             gx[i, j] = np.sum(mask * kernel_x)
             gy[i, j] = np.sum(mask * kernel_y)
 
     magnitude = np.sqrt(gx**2 + gy**2)
 
-    magnitude = cv.normalize(
-        magnitude, None, 0, 255, cv.NORM_MINMAX
-    )
+    magnitude = cv.normalize(magnitude, None, 0, 255, cv.NORM_MINMAX)
 
     return magnitude.astype(np.uint8)
 
