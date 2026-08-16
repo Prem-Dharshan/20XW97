@@ -10,9 +10,7 @@ height, width = img.shape[:2]
 
 scale = 0.5
 
-spatial_scale = cv.resize(
-    img, None, fx=scale, fy=scale
-)
+spatial_scale = cv.resize(img, None, fx=scale, fy=scale)
 
 
 # 2. Spatial quantization by width and height
@@ -20,15 +18,13 @@ spatial_scale = cv.resize(
 new_width = 128
 new_height = 128
 
-spatial_wh = cv.resize(
-    img, (new_width, new_height)
-)
+spatial_wh = cv.resize(img, (new_width, new_height))
 
 
 # 3. Spatial quantization by power
 
 n = 2
-factor = 2 ** n
+factor = 2**n
 
 spatial_power = img[::factor, ::factor]
 

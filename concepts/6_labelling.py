@@ -19,9 +19,9 @@ for i in range(1, h):
         if A == 0:
             continue
 
-        B = pad[i, j - 1]       # Left
-        C = pad[i - 1, j]       # Top
-        D = pad[i - 1, j - 1]   # Top-left
+        B = pad[i, j - 1]  # Left
+        C = pad[i - 1, j]  # Top
+        D = pad[i - 1, j - 1]  # Top-left
 
         B_label = label[i, j - 1]
         C_label = label[i - 1, j]
