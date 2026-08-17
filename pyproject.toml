@@ -1,7 +1,7 @@
 [project]
 name = "20xw97"
 version = "0.1.0"
-description = "Add your description here"
+description = "Computer Vision Lab (20XW97) coursework and from-scratch algorithm implementations"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

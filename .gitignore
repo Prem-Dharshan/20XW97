@@ -10,3 +10,10 @@ wheels/
 .venv
 .vscode/
 uv.lock
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
