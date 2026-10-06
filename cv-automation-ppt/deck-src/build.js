@@ -43,7 +43,7 @@ pres.defineSlideMaster({
   objects: [
     { placeholder: { options: { name: "kicker", type: "body", x: MX, y: 0.42, w: 7.0, h: 0.3, fontSize: 12, bold: true, color: AMBER_DK, charSpacing: 2, margin: 0, valign: "middle" }, text: "" } },
     { placeholder: { options: { name: "title", type: "title", x: MX, y: 0.78, w: W - 2 * MX, h: 0.75, fontSize: 30, bold: true, color: NAVY, margin: 0, valign: "top", align: "left" }, text: "" } },
-    { text: { text: "Computer Vision & Automation  |  GD Naidu Flyover speed check", options: { x: MX, y: 7.02, w: 7, h: 0.28, fontSize: 10, color: MUTED, margin: 0 } } },
+    { text: { text: "Computer Vision & Automation  |  20XW97", options: { x: MX, y: 7.02, w: 7, h: 0.28, fontSize: 10, color: MUTED, margin: 0 } } },
   ],
   slideNumber: { x: W - MX - 0.6, y: 7.02, w: 0.6, h: 0.28, fontSize: 10, color: MUTED, align: "right", margin: 0 },
 });
@@ -140,21 +140,211 @@ async function build() {
   let s = pres.addSlide({ masterName: "BLANK_DARK", sectionTitle: "Opening" });
   T(s, "COMPUTER VISION (20XW97)  ·  COURSE PRESENTATION", { x: MX, y: 1.5, w: 8, h: 0.35, fontSize: 13, bold: true, color: AMBER, charSpacing: 2 });
   s.addText("Computer Vision & Automation", { x: MX, y: 2.0, w: 8.2, h: 1.9, fontSize: 52, bold: true, color: WHITE, fontFace: THEME.headFontFace, margin: 0, valign: "top", isTextBox: true });
-  T(s, "From pixels to penalties: automated speed enforcement on Coimbatore's GD Naidu Flyover", { x: MX, y: 4.05, w: 7.6, h: 0.9, fontSize: 20, color: "D0D5DD" });
+  T(s, "Where computer vision automates real work, and a deep dive into speed enforcement on Coimbatore's GD Naidu Flyover", { x: MX, y: 4.05, w: 7.8, h: 1.3, fontSize: 20, color: "D0D5DD" });
   T(s, "Thithiksha   ·   Arul   ·   DPD", { x: MX, y: 5.75, w: 7, h: 0.4, fontSize: 18, bold: true, color: WHITE });
   // speed-limit sign
   s.addShape(pres.shapes.OVAL, { x: 9.0, y: 1.75, w: 3.6, h: 3.6, fill: { color: WHITE }, line: { color: RED, width: 22 }, objectName: "speed-sign" });
   s.addText("60", { x: 9.0, y: 1.75, w: 3.6, h: 3.6, fontSize: 110, bold: true, color: INK, align: "center", valign: "middle", margin: 0, isTextBox: true });
   T(s, "km/h  ·  posted limit on the flyover", { x: 8.6, y: 5.6, w: 4.4, h: 0.35, fontSize: 13, color: MUTED, align: "center" });
-  s.addNotes(`[Thithiksha | ~30 s]
-Good morning. We're Thithiksha, Arul and DPD, and our topic is Computer Vision and Automation.
-Rather than survey the field, we'll take one real, local problem and build the whole solution in front of you: detecting speeding vehicles on Coimbatore's GD Naidu Flyover using only a camera.
-The 60 on this slide is the flyover's posted speed limit. Everything in the next 25 minutes builds towards one question: did a vehicle cross 60, and can a computer decide that by itself?
-I'll cover how machines see, Arul will explain how we go from detections to speed, and DPD will close the loop and run a live demo.`);
+  s.addNotes(`[~30 s]
+Good morning. Our topic is Computer Vision and Automation.
+We'll do this in two moves. First, a quick tour of where computer vision already automates real work: factories, farms, hospitals, warehouses, roads and airports, each with real numbers and an honest reality check.
+Then we go deep on one local problem and build the whole solution: detecting speeding vehicles on Coimbatore's GD Naidu Flyover using only a camera. The 60 on this slide is the flyover's posted speed limit, and the deep dive builds towards one question: did a vehicle cross 60, and can a computer decide that by itself?
+We'll finish with a live demo.`);
+
+  // 2. Agenda
+  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "Opening" });
+  s.addText("AGENDA", { placeholder: "kicker" });
+  s.addText("From the big picture to one working system", { placeholder: "title" });
+  const parts = [
+    ["01", "CV automation today", "Six domains, real deployments"],
+    ["02", "How machines see", "Pixels, CNNs, YOLO detection, metrics"],
+    ["03", "From detections to speed", "Tracking, homography, speed, error analysis"],
+    ["04", "Closing the loop", "Automation, deployment, live demo, results"],
+  ];
+  const pw = (W - 2 * MX - 3 * 0.3) / 4;
+  parts.forEach(([n, a, b], i) => {
+    const x = MX + i * (pw + 0.3);
+    card(s, x, 1.95, pw, 2.3, i === 0 ? LIGHT : LIGHT);
+    T(s, n, { x: x + 0.3, y: 2.05, w: 1.5, h: 0.8, fontSize: 40, bold: true, color: AMBER, valign: "bottom" });
+    T(s, a, { x: x + 0.3, y: 2.95, w: pw - 0.5, h: 0.62, fontSize: 17, bold: true, color: NAVY });
+    T(s, b, { x: x + 0.3, y: 3.6, w: pw - 0.5, h: 0.6, fontSize: 13, color: SLATE });
+  });
+  T(s, "Deep dive (02–04): one pipeline, five stages, built and demoed on the GD Naidu Flyover", { x: MX, y: 4.55, w: W - 2 * MX, h: 0.35, fontSize: 15, bold: true, color: NAVY });
+  const icons4 = ["LuScanSearch", "LuCrosshair", "LuRoute", "LuRuler", "LuSiren"];
+  const desc4 = ["Image as numbers", "Find vehicles", "Keep identity", "Pixels → km/h", "Rule → evidence"];
+  const bw4 = 2.05, g4 = 0.46, x04 = MX;
+  for (let i = 0; i < 5; i++) {
+    const x = x04 + i * (bw4 + g4);
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y: 5.1, w: bw4, h: 1.25, rectRadius: 0.08, fill: { color: NAVY }, line: { type: "none" }, objectName: "stage" });
+    s.addImage({ data: await icon(icons4[i], HEX.accent1), x: x + 0.22, y: 5.32, w: 0.45, h: 0.45, altText: STAGES[i] });
+    T(s, STAGES[i], { x: x + 0.8, y: 5.28, w: bw4 - 0.9, h: 0.5, fontSize: 14, bold: true, color: WHITE, valign: "middle" });
+    T(s, desc4[i], { x: x + 0.22, y: 5.85, w: bw4 - 0.35, h: 0.35, fontSize: 12, color: "D0D5DD" });
+    if (i < 4) s.addImage({ data: await icon("LuArrowRight", HEX.accent5), x: x + bw4 + 0.08, y: 5.58, w: 0.3, h: 0.3, altText: "arrow" });
+  }
+  s.addNotes(`[~40 s]
+Here's the plan. First, the big picture: six domains where computer vision is already automating real work, each with a real deployment and an honest reality check.
+Then we go deep on one of them, automated speed enforcement, and build it stage by stage: pixels, detection, tracking, measurement and action. The five boxes at the bottom are that pipeline, and the small chips at the top right of later slides show where we are in it.
+We finish with a live demo of the system and its results.`);
+
+  // ===== Section 01: CV automation today =====
+  pres.addSection({ title: "01 CV automation today" });
+  s = pres.addSlide({ masterName: "SECTION", sectionTitle: "01 CV automation today" });
+  s.addText("01", { placeholder: "number" });
+  s.addText("Where CV automates today", { placeholder: "title" });
+  s.addText("Six domains, real deployments, real numbers", { placeholder: "presenter" });
+  s.addNotes(`[~10 s]
+Before we build anything, let's look at where computer vision already replaces human eyes in real, deployed systems.`);
+
+  // Overview grid
+  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "01 CV automation today" });
+  s.addText("THE LANDSCAPE", { placeholder: "kicker" });
+  s.addText("Every industry runs the same loop: see, decide, act", { placeholder: "title" });
+  const dom = [
+    ["LuFactory", "Manufacturing", "Defect inspection on the line", "Detection · anomaly detection"],
+    ["LuSprout", "Agriculture", "Spray only the weeds", "Classification · detection"],
+    ["LuStethoscope", "Healthcare", "Screening scans and X-rays", "Classification · segmentation"],
+    ["LuPackage", "Logistics & retail", "Picking, sorting, checkout", "Detection · segmentation · OCR"],
+    ["LuCar", "Mobility", "Driverless navigation", "Detection · tracking · segmentation"],
+    ["LuLandmark", "Public sector", "Traffic enforcement, ID checks", "Detection · ANPR · face recognition"],
+  ];
+  const tw = (W - 2 * MX - 2 * 0.3) / 3, th = 2.0;
+  for (let i = 0; i < dom.length; i++) {
+    const x = MX + (i % 3) * (tw + 0.3), y = 1.95 + Math.floor(i / 3) * (th + 0.3);
+    card(s, x, y, tw, th, i === 5 ? "FEF0C7" : LIGHT);
+    await iconCircle(s, x + 0.3, y + 0.3, 0.65, dom[i][0], NAVY, HEX.accent1);
+    T(s, dom[i][1], { x: x + 1.15, y: y + 0.32, w: tw - 1.35, h: 0.6, fontSize: 18, bold: true, color: NAVY, valign: "middle" });
+    T(s, dom[i][2], { x: x + 0.3, y: y + 1.08, w: tw - 0.6, h: 0.35, fontSize: 15, color: INK });
+    T(s, dom[i][3], { x: x + 0.3, y: y + 1.46, w: tw - 0.6, h: 0.35, fontSize: 12, bold: true, color: AMBER_DK });
+  }
+  T(s, [{ text: "Common pattern: ", options: { bold: true, color: NAVY } }, { text: "camera → model → decision → action, with no human checking each item. Highlighted: where our deep dive sits." }],
+    { x: MX, y: 6.35, w: W - 2 * MX, h: 0.4, fontSize: 14, color: SLATE });
+  s.addNotes(`[~1 min]
+Here's the map. Six domains where vision is already automating work at scale. The applications look different, a weed, a tumour, a parcel, a pedestrian, but the structure is always the same: a camera senses, a model decides, and a machine or a system acts, with no person checking each individual item.
+The orange line under each tile is the CV task underneath. They're the same handful of tasks we'll explain in the theory section: classification, detection, segmentation, tracking and text or face recognition.
+We'll spend one slide on each, with a real deployment, a real number, and a reality check, because none of these are as simple as the marketing suggests. The highlighted tile, public sector traffic enforcement, is where our deep dive and demo sit.`);
+
+  const domain = async (d) => {
+    s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "01 CV automation today" });
+    s.addText(d.kicker, { placeholder: "kicker" });
+    s.addText(d.title, { placeholder: "title" });
+    // stat card
+    card(s, MX, 1.95, 3.9, 2.45, NAVY);
+    T(s, d.stat, { x: MX + 0.3, y: 2.05, w: 3.3, h: 1.05, fontSize: d.statSize || 54, bold: true, color: d.statColor || AMBER, valign: "bottom" });
+    T(s, d.statLabel, { x: MX + 0.3, y: 3.15, w: 3.3, h: 1.15, fontSize: 14, color: "D0D5DD" });
+    // sense -> decide -> act
+    const fx0 = MX + 3.9 + 0.35, fw3 = (W - MX - fx0 - 2 * 0.35) / 3;
+    const lab = ["SENSE", "DECIDE", "ACT"], ic = ["LuScanEye", "LuBrain", "LuZap"];
+    for (let i = 0; i < 3; i++) {
+      const x = fx0 + i * (fw3 + 0.35);
+      card(s, x, 1.95, fw3, 2.45);
+      await iconCircle(s, x + 0.25, 2.15, 0.55, ic[i], NAVY, HEX.accent1);
+      T(s, lab[i], { x: x + 0.95, y: 2.15, w: fw3 - 1.1, h: 0.55, fontSize: 12, bold: true, color: AMBER_DK, charSpacing: 2, valign: "middle" });
+      T(s, d.flow[i], { x: x + 0.25, y: 2.85, w: fw3 - 0.45, h: 1.45, fontSize: 14, color: INK });
+      if (i < 2) s.addImage({ data: await icon("LuArrowRight", HEX.accent5), x: x + fw3 + 0.04, y: 3.05, w: 0.27, h: 0.27, altText: "arrow" });
+    }
+    // CV tasks + second example
+    card(s, MX, 4.65, 3.9, 0.95);
+    T(s, "CV TASKS", { x: MX + 0.3, y: 4.72, w: 3.3, h: 0.28, fontSize: 11, bold: true, color: SLATE, charSpacing: 2 });
+    T(s, d.tasks, { x: MX + 0.3, y: 5.0, w: 3.4, h: 0.5, fontSize: 14, bold: true, color: NAVY, valign: "middle" });
+    card(s, fx0, 4.65, W - MX - fx0, 0.95);
+    T(s, d.also, { x: fx0 + 0.3, y: 4.65, w: W - MX - fx0 - 0.6, h: 0.95, fontSize: 14, color: INK, valign: "middle" });
+    // reality check
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: MX, y: 5.8, w: W - 2 * MX, h: 0.75, rectRadius: 0.08, fill: { color: "FEF0C7" }, line: { type: "none" }, objectName: "reality-check" });
+    s.addImage({ data: await icon("LuTriangleAlert", HEX.accent6), x: MX + 0.25, y: 5.97, w: 0.4, h: 0.4, altText: "reality check" });
+    T(s, [{ text: "Reality check: ", options: { bold: true, color: AMBER_DK } }, { text: d.reality, options: { color: INK } }], { x: MX + 0.85, y: 5.8, w: W - 2 * MX - 1.1, h: 0.75, fontSize: 14, valign: "middle" });
+    source(s, "Sources: " + d.source);
+    s.addNotes(d.notes);
+  };
+
+  await domain({
+    kicker: "DOMAIN 1 · MANUFACTURING", title: "Manufacturing: every part inspected, not a sample",
+    stat: "400+", statLabel: "AI applications in use at BMW Group; its AIQX platform checks parts on the assembly line in fractions of a second",
+    flow: ["Cameras along the line, synced to each car's position", "Deep-learning model checks each component: present, correct, undamaged", "Flags the car for rework at once; data goes back to quality teams"],
+    tasks: "Detection · anomaly detection",
+    also: [{ text: "Also: ", options: { bold: true, color: NAVY } }, { text: "weld-seam, paint and PCB solder-joint inspection. Same idea: a camera at every station instead of a human spot-check." }],
+    reality: "defects are rare, so there are few 'bad' images to train on. Teams learn what 'normal' looks like (anomaly detection) or generate synthetic defects.",
+    source: "BMW Group / Axis Communications case study (AIQX).",
+    notes: `[~1 min]
+Manufacturing was one of the first places vision automation paid off. BMW's AIQX platform puts cameras along the assembly line. Each image is matched to the exact vehicle passing that point, and a deep-learning model checks whether each component is there, correct and undamaged, in a fraction of a second. If something's wrong, the car is flagged for rework immediately. BMW reports more than 400 AI applications across its operations.
+The shift is from sampling to 100% inspection: a human checks one part in a hundred, a camera checks every one.
+The honest catch: defects are rare, so you have thousands of good images and only a handful of bad ones. That's why industrial inspection leans on anomaly detection, where you learn what normal looks like and flag anything that isn't.`,
+  });
+
+  await domain({
+    kicker: "DOMAIN 2 · AGRICULTURE", title: "Agriculture: cameras spray the weed, not the field",
+    stat: "59%", statLabel: "average herbicide saved by John Deere See & Spray users across 1M+ acres in the US (2024)",
+    flow: ["Cameras on the sprayer boom scan the ground at driving speed", "Model separates weed from crop, frame by frame", "Only the nozzle above the weed fires, in milliseconds"],
+    tasks: "Classification · detection",
+    also: [{ text: "Scale: ", options: { bold: true, color: NAVY } }, { text: "≈ 8 million gallons of herbicide mix not sprayed in 2024. Also: fruit-picking robots, yield counting, disease spotting from drone images." }],
+    reality: "59% is the vendor's figure. An independent Iowa State study measured 44–87% depending on the field; savings depend on how many weeds there are.",
+    source: "John Deere news release (Sep 2024); Iowa State University study via Grainews.",
+    notes: `[~1 min]
+Agriculture is a great example of perception driving a physical action. John Deere's See & Spray mounts cameras along the sprayer boom. As the tractor drives, a model classifies every plant as crop or weed, and only the nozzle directly above a weed fires.
+Across more than a million acres in 2024, Deere reports an average herbicide saving of 59%, about 8 million gallons of mix not sprayed. That's less chemical in the soil and lower cost for the farmer.
+Reality check: that's the manufacturer's number. An independent Iowa State study found anywhere from 44 to 87% savings, because it depends on how weedy the field is. Same lesson as our speed demo: always ask who measured it and under what conditions.`,
+  });
+
+  await domain({
+    kicker: "DOMAIN 3 · HEALTHCARE", title: "Healthcare: AI screens, the doctor decides",
+    stat: "1,451", statLabel: "AI-enabled medical devices authorised by the US FDA (to Dec 2025); 76% are for radiology imaging",
+    flow: ["Retinal camera or chest X-ray captures the image", "Classifier scores disease likelihood, e.g. diabetic retinopathy in ~20 s", "Refers the patient to a specialist or moves the scan up the reading queue"],
+    tasks: "Classification · segmentation",
+    also: [{ text: "India: ", options: { bold: true, color: NAVY } }, { text: "Qure.ai's chest X-ray AI screens for TB at ~150 sites in 24 states; TB notifications up 30–40% where used. IDx-DR (2018): first FDA-cleared autonomous AI diagnosis." }],
+    reality: "IDx-DR's 87% sensitivity means about 1 in 8 cases is missed. These tools triage and screen; a clinician remains responsible.",
+    source: "US FDA AI-enabled device list; IDx-DR pivotal trial (AAO, 2018); Qure.ai / press coverage.",
+    notes: `[~1 min]
+Healthcare is where vision automation is most regulated and most cautious. The US FDA has now authorised over 1,400 AI-enabled devices, and three quarters of them are in radiology, so they're vision models reading images.
+The milestone was IDx-DR in 2018, the first autonomous AI diagnosis: a retinal camera plus a classifier that decides in about 20 seconds whether a diabetic patient needs a specialist, without a doctor reading the image. Closer to home, Qure.ai's chest X-ray model screens for tuberculosis at around 150 sites in 24 Indian states, and TB notifications rose 30 to 40% where it was deployed, because more cases get flagged early.
+Reality check: IDx-DR's sensitivity was 87%, so roughly one case in eight is missed. That's why these are screening tools; the responsibility stays with the clinician.`,
+  });
+
+  await domain({
+    kicker: "DOMAIN 4 · LOGISTICS & RETAIL", title: "Logistics & retail: picking scales, checkout struggled",
+    stat: "1,000+", statColor: RED, statLabel: "remote staff labelled and reviewed video behind Amazon's camera-based Just Walk Out checkout",
+    flow: ["Camera looks into a tote of mixed products", "Detects and segments each item, picks a grasp point (Amazon Sparrow)", "Robot arm picks the item and places it for packing"],
+    tasks: "Detection · segmentation · OCR",
+    also: [{ text: "2024: ", options: { bold: true, color: NAVY } }, { text: "Amazon removed Just Walk Out from its US Fresh grocery stores, keeping it in smaller Amazon Go stores. Parcel-label OCR and barcode sorting are routine." }],
+    reality: "checkout had to get every item, shopper and hand movement right. The hard cases went to humans, and the system improved more slowly than planned.",
+    source: "Supply Chain Dive (Sparrow, 2022); CNBC and The Batch (Apr 2024) on Just Walk Out.",
+    notes: `[~1 min]
+Logistics shows both sides. In warehouses, vision works well: Amazon's Sparrow robot looks into a bin of mixed products, detects and segments each one among millions of possible items, chooses where to grip, and picks it. Parcel sorting by reading labels and barcodes is completely routine.
+Retail checkout is the cautionary tale. Just Walk Out used ceiling cameras to work out what each shopper took. In 2024 Amazon removed it from its US Fresh grocery stores. Reports said more than 1,000 remote workers were labelling video and reviewing cases the system couldn't handle.
+The lesson: a controlled bin is a solved problem; a crowded store with people blocking each other is not. Same question as the flyover: how often is the system right without a human?`,
+  });
+
+  await domain({
+    kicker: "DOMAIN 5 · MOBILITY", title: "Mobility: driverless taxis at commercial scale",
+    stat: "500K", statLabel: "paid driverless rides per week by Waymo across 10 US cities (Mar 2026), up 10× from ~50K in May 2024",
+    flow: ["360° cameras, plus LiDAR and radar", "Detects, tracks and predicts every road user; plans a path", "Steers, brakes and accelerates, many times per second"],
+    tasks: "Detection · tracking · segmentation",
+    also: [{ text: "Link to our demo: ", options: { bold: true, color: NAVY } }, { text: "the same detect-then-track loop you'll see on the flyover footage, running at much higher stakes and with prediction added." }],
+    reality: "not vision alone. Waymo fuses cameras with LiDAR and radar and drives only in cities it has mapped in detail.",
+    source: "Waymo co-CEO remarks (Claims Journal, Feb 2026); industry reports (Mar 2026).",
+    notes: `[~1 min]
+Mobility is the most demanding version of the loop. Waymo now gives about half a million paid driverless rides a week across ten US cities, roughly ten times more than in May 2024.
+Every fraction of a second the car senses with cameras, LiDAR and radar, detects and tracks every road user (the same detect-then-track idea we'll use on the flyover), predicts where each one will go, plans a path, and acts on the steering and brakes.
+Reality check: it isn't vision alone. Waymo fuses cameras with LiDAR and radar for depth and redundancy, and it only operates in cities it has mapped in detail. When a wrong decision can kill someone, one sensor isn't enough.`,
+  });
+
+  await domain({
+    kicker: "DOMAIN 6 · PUBLIC SECTOR, INDIA", title: "Public sector: India already runs CV at scale",
+    stat: "726", statLabel: "AI traffic cameras in Kerala's Safe Kerala project; daily violations fell from 4.5 lakh to 2.1 lakh, per the state",
+    flow: ["Roadside cameras watch every lane, day and night", "Detect helmetless riding, triple riding, phone use; read the number plate", "Evidence goes to a control room, which issues an e-challan"],
+    tasks: "Detection · ANPR · face recognition",
+    also: [{ text: "DigiYatra: ", options: { bold: true, color: NAVY } }, { text: "face-recognition boarding at 24 airports with ~1.9 crore app users (Nov 2025). Your face replaces the boarding pass and ID check." }],
+    reality: "the violation figures are the department's own claim, and face and plate data raise consent and retention questions. Next: one such system, end to end.",
+    source: "Onmanorama / Kerala Kaumudi (2023); Ministry of Civil Aviation via Swarajya (2025).",
+    notes: `[~1 min]
+Finally, the public sector, and this is where India is already deploying at scale. Kerala's Safe Kerala project installed 726 AI cameras that detect helmetless riding, triple riding and phone use, read the number plate, and send evidence to a control room that issues the challan. The state says daily violations fell from about 4.5 lakh to 2.1 lakh.
+At 24 airports, DigiYatra uses face recognition so your face replaces the boarding pass and ID check; about 1.9 crore people have signed up.
+Reality check: those traffic numbers are the department's own claim, and storing faces and number plates raises real questions about consent and retention.
+That brings us to our deep dive: one of these enforcement systems, on one road in Coimbatore, built end to end.`,
+  });
 
   // 2. Problem
-  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "Opening" });
-  s.addText("THE PROBLEM", { placeholder: "kicker" });
+  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "01 CV automation today" });
+  s.addText("DEEP DIVE · THE PROBLEM", { placeholder: "kicker" });
   s.addText("Tamil Nadu's longest flyover has a speeding problem", { placeholder: "title" });
   // schematic of the flyover
   const fy = 2.25, fx0 = MX + 0.2, fx1 = W - MX - 0.2;
@@ -181,14 +371,14 @@ I'll cover how machines see, Arul will explain how we go from detections to spee
   T(s, [{ text: "Why it matters: ", options: { bold: true, color: NAVY } }, { text: "on a long, uninterrupted, elevated stretch, drivers misjudge speed. Police say the flyover tempts drivers well past 60 km/h." }],
     { x: MX, y: 5.8, w: W - 2 * MX, h: 0.6, fontSize: 16, color: INK });
   source(s, "Sources: Wikipedia, G. D. Naidu Elevated Expressway; The Week (9 Oct 2025); Lokmat Times; BizzBuzz.");
-  s.addNotes(`[Thithiksha | ~1 min]
-This is the GD Naidu Elevated Expressway on Avinashi Road: 10.1 kilometres, four lanes, from Uppilipalayam to Goldwins. It opened on 9 October 2025 and it's the longest flyover in Tamil Nadu. It skips about twelve signals, which is exactly why people speed on it.
+  s.addNotes(`[~1 min]
+Our deep dive is the GD Naidu Elevated Expressway on Avinashi Road: 10.1 kilometres, four lanes, from Uppilipalayam to Goldwins. It opened on 9 October 2025 and it's the longest flyover in Tamil Nadu. It skips about twelve signals, which is exactly why people speed on it.
 The posted limit is 60 km/h. Within days of opening, a car coming off the flyover near Goldwins hit a parked truck and three people died. Witnesses said vehicles routinely ignore the limit.
 On an elevated road with no junctions, you lose your sense of speed, so 90 can feel like 60. A traffic officer with a radar gun can't cover 10 km. That's an automation problem, and the sensor that can solve it is a camera.`);
 
   // 3. Status check
-  s = pres.addSlide({ masterName: "DARK", sectionTitle: "Opening" });
-  s.addText("REALITY CHECK", { placeholder: "kicker" });
+  s = pres.addSlide({ masterName: "DARK", sectionTitle: "01 CV automation today" });
+  s.addText("DEEP DIVE · REALITY CHECK", { placeholder: "kicker" });
   s.addText("AI enforcement is already installed here, and still in trial", { placeholder: "title" });
   const st3 = [["44", "AI-enabled cameras along the flyover"], ["16", "digital display boards"], ["₹3 Cr", "approximate project cost"], ["3+ months", "in trial, no fines issued"]];
   st3.forEach(([b, l], i) => {
@@ -210,57 +400,24 @@ On an elevated road with no junctions, you lose your sense of speed, so 90 can f
   T(s, [{ text: "Today's question:  ", options: { bold: true, color: AMBER } }, { text: "how does such a system work, and why isn't 80% good enough to fine people?", options: { color: WHITE } }],
     { x: MX + 0.3, y: 5.75, w: W - 2 * MX - 0.6, h: 0.8, fontSize: 18, valign: "middle" });
   source(s, "Sources: BizzBuzz; The Hawk; NewKerala (2026) on the GD Naidu Flyover AI speed-enforcement trial.", true);
-  s.addNotes(`[Thithiksha | ~1 min]
+  s.addNotes(`[~1 min]
 This isn't hypothetical. The State Highways Department has installed 44 AI cameras and 16 display boards on this flyover, for about 3 crore rupees.
 More than three months after installation, the system was still in trial and no fines had been issued. The reason was accuracy: it reportedly started at around 20%, with misidentified violations, and was tuned up to about 80%.
 80% sounds good until you remember that one in five tickets would go to the wrong person. That's the tension in this whole talk: automating perception is easy to demo and hard to trust.
 So today we'll show how a system like this works, stage by stage, where it breaks, and then a working version of it.`);
 
-  // 4. Agenda / pipeline
-  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "Opening" });
-  s.addText("ROADMAP", { placeholder: "kicker" });
-  s.addText("One pipeline, five stages, three speakers", { placeholder: "title" });
-  const icons4 = ["LuScanSearch", "LuCrosshair", "LuRoute", "LuRuler", "LuSiren"];
-  const desc4 = ["Image as numbers", "Find vehicles (YOLO)", "Keep identity (ByteTrack)", "Pixels → metres → km/h", "Rule → evidence → alert"];
-  const bw4 = 2.05, g4 = 0.46, y4 = 2.35;
-  const x04 = (W - (5 * bw4 + 4 * g4)) / 2;
-  for (let i = 0; i < 5; i++) {
-    const x = x04 + i * (bw4 + g4);
-    card(s, x, y4, bw4, 2.15);
-    await iconCircle(s, x + (bw4 - 0.8) / 2, y4 + 0.25, 0.8, icons4[i], NAVY, HEX.accent1);
-    T(s, STAGES[i], { x, y: y4 + 1.2, w: bw4, h: 0.35, fontSize: 15, bold: true, color: NAVY, align: "center" });
-    T(s, desc4[i], { x: x + 0.1, y: y4 + 1.55, w: bw4 - 0.2, h: 0.5, fontSize: 13, color: SLATE, align: "center" });
-    if (i < 4) s.addImage({ data: await icon("LuArrowRight", HEX.accent5), x: x + bw4 + 0.08, y: y4 + 0.85, w: 0.3, h: 0.3, altText: "arrow" });
-  }
-  const parts = [
-    ["01  Thithiksha", "How machines see", "~7 min", 0, 2],
-    ["02  Arul", "From detections to speed", "~8 min", 2, 4],
-    ["03  DPD", "Automation + demo", "~6 min + demo", 4, 5],
-  ];
-  parts.forEach(([who, what, t, a, b]) => {
-    const x = x04 + a * (bw4 + g4), w = (b - a) * bw4 + (b - a - 1) * g4;
-    s.addShape(pres.shapes.LINE, { x, y: 4.75, w, h: 0, line: { color: AMBER, width: 3 }, objectName: "bracket" });
-    T(s, who, { x, y: 4.9, w, h: 0.35, fontSize: 16, bold: true, color: NAVY });
-    T(s, what, { x, y: 5.25, w, h: 0.35, fontSize: 14, color: INK });
-    T(s, t, { x, y: 5.6, w, h: 0.3, fontSize: 12, color: SLATE });
-  });
-  s.addNotes(`[Thithiksha | ~40 s]
-Here's the map for the talk. Every automated vision system is a pipeline, and ours has five stages. Pixels: what an image actually is to a computer. Detect: finding every vehicle in a frame. Track: knowing that the car in this frame is the same car in the next frame. Measure: converting pixel movement into kilometres per hour. Act: turning that number into a decision and evidence, with no human in between.
-I'll cover pixels and detection. Arul, who built this system during his internship, covers tracking and measurement. DPD closes the loop with automation and the live demo.
-Watch the small chips at the top right of each slide; they show where we are in the pipeline.`);
-
   // ===== Section 1 =====
-  pres.addSection({ title: "01 How machines see" });
-  s = pres.addSlide({ masterName: "SECTION", sectionTitle: "01 How machines see" });
-  s.addText("01", { placeholder: "number" });
+  pres.addSection({ title: "02 How machines see" });
+  s = pres.addSlide({ masterName: "SECTION", sectionTitle: "02 How machines see" });
+  s.addText("02", { placeholder: "number" });
   s.addText("How machines see", { placeholder: "title" });
-  s.addText("Thithiksha  ·  Pixels and detection", { placeholder: "presenter" });
+  s.addText("Pixels and detection", { placeholder: "presenter" });
   chips(s, ["PIXELS", "DETECT"], true);
-  s.addNotes(`[Thithiksha | ~10 s]
+  s.addNotes(`[~10 s]
 Let's start at the bottom: what does a camera actually give a computer?`);
 
   // 5. Pixels
-  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "01 How machines see" });
+  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "02 How machines see" });
   s.addText("PIXELS", { placeholder: "kicker" });
   s.addText("To a computer, an image is just a grid of numbers", { placeholder: "title" });
   chips(s, ["PIXELS"]);
@@ -275,13 +432,13 @@ Let's start at the bottom: what does a camera actually give a computer?`);
   s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: MX, y: 5.85, w: W - 2 * MX, h: 0.7, rectRadius: 0.08, fill: { color: NAVY }, line: { type: "none" }, objectName: "callout" });
   T(s, [{ text: "Every CV task ", options: { bold: true, color: AMBER } }, { text: "is a function that turns this array into a decision.", options: { color: WHITE } }],
     { x: MX + 0.3, y: 5.85, w: W - 2 * MX - 0.6, h: 0.7, fontSize: 17, valign: "middle" });
-  s.addNotes(`[Thithiksha | ~1 min]
+  s.addNotes(`[~1 min]
 A camera doesn't give us "a car". It gives us a 3D array: height, width, and three colour channels, each value from 0 to 255. On the left is a frame from the traffic-camera clip we use in the demo, and the zoom shows the real pixel values on one car: the bright roof around 230, the dark rear window around 90. That sharp jump is an edge, and edges are what the next slides build on.
 One 1080p frame is about 6.2 million numbers. At 30 frames per second, that's nearly 190 million numbers every second.
 Everything in computer vision, whether it's classical image processing or deep learning, is a function that takes this array and produces something useful: a mask, a box, a label, or here, a speed. The rest of the talk is that function, one stage at a time.`);
 
   // 6. Background subtraction
-  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "01 How machines see" });
+  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "02 How machines see" });
   s.addText("CLASSICAL CV", { placeholder: "kicker" });
   s.addText("Classical CV sees motion, not vehicles", { placeholder: "title" });
   chips(s, ["DETECT"]);
@@ -300,13 +457,13 @@ Everything in computer vision, whether it's classical image processing or deep l
   }
   s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: rx6, y: 5.95, w: rw6, h: 0.55, rectRadius: 0.08, fill: { color: "FEF0C7" }, line: { type: "none" }, objectName: "verdict" });
   T(s, "Fast, no training, too fragile for fines", { x: rx6 + 0.2, y: 5.95, w: rw6 - 0.4, h: 0.55, fontSize: 14, bold: true, color: AMBER_DK, valign: "middle" });
-  s.addNotes(`[Thithiksha | ~1.5 min]
+  s.addNotes(`[~1.5 min]
 Before deep learning, the standard approach to traffic video was background subtraction. You build a statistical model of the empty road (OpenCV's MOG2 is a common choice), and any pixel that differs from it is marked as foreground. On the right of the image you see the mask: white blobs where things are moving.
 It's fast and needs no training data, but look at the failure list. Shadows move with the vehicle and inflate the blob. At night, headlight glare creates motion where there's no car. A flyover vibrates, so the whole frame can look like it's moving. Two cars close together merge into one blob. And it never tells you what the blob is.
 For counting traffic it's often fine; for issuing a fine to a specific vehicle it isn't. We need a method that recognises vehicles, not just motion.`);
 
   // 7. CNN
-  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "01 How machines see" });
+  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "02 How machines see" });
   s.addText("DEEP LEARNING", { placeholder: "kicker" });
   s.addText("CNNs learn their own feature detectors from data", { placeholder: "title" });
   chips(s, ["DETECT"]);
@@ -324,13 +481,13 @@ For counting traffic it's often fine; for issuing a fine to a specific vehicle i
     if (i < 2) s.addImage({ data: await icon("LuArrowDown", HEX.accent5), x: rx7 + rw7 / 2 - 0.12, y: y + 1.0, w: 0.25, h: 0.25, altText: "arrow" });
   }
   T(s, "Kernels are learned by training, not hand-written. YOLOv8 is pre-trained on COCO: 118k images, 80 classes.", { x: rx7, y: 5.75, w: rw7, h: 0.75, fontSize: 13, color: SLATE });
-  s.addNotes(`[Thithiksha | ~1.5 min]
+  s.addNotes(`[~1.5 min]
 Convolutional neural networks fix this by learning what to look for. The core operation is convolution: take a small grid of weights called a kernel, slide it across the image, and at every position multiply and add. In the animation the kernel is a Sobel filter, and the output lights up exactly where dark meets bright: a vertical edge.
 The key difference from classical CV is that a CNN learns thousands of these kernels from data instead of us designing them. Stacked in layers, early kernels find edges, middle layers combine them into parts like wheels and windows, and deep layers respond to whole objects.
 We don't train from scratch. YOLOv8 comes pre-trained on COCO, 118 thousand images with 80 classes, and those classes already include car, motorcycle, bus and truck. That's why our demo needed no training at all.`);
 
   // 8. YOLO
-  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "01 How machines see" });
+  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "02 How machines see" });
   s.addText("OBJECT DETECTION", { placeholder: "kicker" });
   s.addText("YOLO finds every vehicle in a single pass", { placeholder: "title" });
   chips(s, ["DETECT"]);
@@ -353,14 +510,14 @@ We don't train from scratch. YOLOv8 comes pre-trained on COCO, 118 thousand imag
     T(s, l, { x, y: 5.98, w: cw8, h: 0.35, fontSize: 12, color: SLATE, align: "center" });
   });
   T(s, "YOLOv8n (nano), as used in our demo. Source: Ultralytics docs.", { x: MX, y: 6.3, w: 7.6, h: 0.3, fontSize: 11, color: MUTED });
-  s.addNotes(`[Thithiksha | ~1.5 min]
+  s.addNotes(`[~1.5 min]
 Object detection answers two questions at once: what is in the image, and where. The output is a bounding box, a class and a confidence score, like the boxes on this frame.
 YOLO, "You Only Look Once", does it in a single forward pass of the network. The image is divided into grid cells at three scales. Each cell predicts box coordinates and class scores. That produces many overlapping candidate boxes for the same car, so a final step called non-maximum suppression keeps the highest-confidence box and removes others that overlap it too much.
 One honest detail in this frame: the green bus is labelled "truck". COCO's bus and truck classes get confused, so in our code each vehicle's class is a majority vote over its whole track, and boxes are de-duplicated across classes.
-We use YOLOv8 nano, the smallest model: 3.2 million parameters, 37.3 mAP on COCO, small enough to run on a laptop CPU. That trade-off between size and accuracy comes back in DPD's section.`);
+We use YOLOv8 nano, the smallest model: 3.2 million parameters, 37.3 mAP on COCO, small enough to run on a laptop CPU. That trade-off between size and accuracy comes back in the deployment section.`);
 
   // 9. Metrics
-  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "01 How machines see" });
+  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "02 How machines see" });
   s.addText("EVALUATION", { placeholder: "kicker" });
   s.addText("Detectors are scored on overlap, not 'accuracy'", { placeholder: "title" });
   chips(s, ["DETECT"]);
@@ -385,24 +542,24 @@ We use YOLOv8 nano, the smallest model: 3.2 million parameters, 37.3 mAP on COCO
   s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: MX, y: 5.8, w: W - 2 * MX, h: 0.7, rectRadius: 0.08, fill: { color: NAVY }, line: { type: "none" }, objectName: "callout" });
   T(s, [{ text: "For enforcement, precision comes first: ", options: { bold: true, color: AMBER } }, { text: "every false positive is an innocent driver fined.", options: { color: WHITE } }],
     { x: MX + 0.3, y: 5.8, w: W - 2 * MX - 0.6, h: 0.7, fontSize: 17, valign: "middle" });
-  s.addNotes(`[Thithiksha | ~1.5 min]
+  s.addNotes(`[~1.5 min]
 How do we know a detector is good? Not with a single "accuracy" number. First, a predicted box only counts as correct if it overlaps the true box enough. That's Intersection over Union: overlap area divided by combined area. The usual threshold is 0.5.
 Then two numbers. Precision: of everything we flagged, how much was real? Recall: of everything that was really there, how much did we find? mAP averages precision across classes and across IoU thresholds from 0.5 to 0.95. That's the 37.3 on the previous slide.
 For speed enforcement these aren't equally important. Missing a speeder (low recall) means one gets away. A false positive (low precision) means an innocent person gets a fine. That's why the flyover system stayed in trial at 80%.
-That's detection. Over to Arul, who'll show why detection alone can't measure speed.`);
+That's detection. Next: why detection alone can't measure speed.`);
 
   // ===== Section 2 =====
-  pres.addSection({ title: "02 From detections to speed" });
-  s = pres.addSlide({ masterName: "SECTION", sectionTitle: "02 From detections to speed" });
-  s.addText("02", { placeholder: "number" });
+  pres.addSection({ title: "03 From detections to speed" });
+  s = pres.addSlide({ masterName: "SECTION", sectionTitle: "03 From detections to speed" });
+  s.addText("03", { placeholder: "number" });
   s.addText("From detections to speed", { placeholder: "title" });
-  s.addText("Arul  ·  Tracking and measurement", { placeholder: "presenter" });
+  s.addText("Tracking and measurement", { placeholder: "presenter" });
   chips(s, ["TRACK", "MEASURE"], true);
-  s.addNotes(`[Arul | ~10 s]
-Thanks, Thithiksha. We can now find vehicles in a frame. To measure speed we need two more things: memory and a ruler.`);
+  s.addNotes(`[~10 s]
+We can now find vehicles in a frame. To measure speed we need two more things: memory and a ruler.`);
 
   // 10. No memory
-  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "02 From detections to speed" });
+  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "03 From detections to speed" });
   s.addText("WHY TRACKING", { placeholder: "kicker" });
   s.addText("Detection has no memory; tracking adds identity", { placeholder: "title" });
   chips(s, ["TRACK"]);
@@ -426,13 +583,13 @@ Thanks, Thithiksha. We can now find vehicles in a frame. To measure speed we nee
     }
     T(s, note, { x: fx, y: y + fh + 0.35, w: 3 * fw + 2 * fg, h: 0.3, fontSize: 14, color: r ? NAVY : SLATE, bold: !!r });
   }
-  s.addNotes(`[Arul | ~1 min]
+  s.addNotes(`[~1 min]
 YOLO processes every frame independently. In frame t it says "car", in t+1 "car", in t+2 "car". It has no idea these are the same car, and speed is about the same object moving over time.
 So we add tracking: give every vehicle a persistent ID, here number 7, and follow it from frame to frame. Once we have an identity, we have a trajectory, a list of positions over time. A trajectory plus a clock gives us speed.
 The tricky part is that tracking has to survive the real world: missed detections, cars hidden behind trucks, and many similar-looking cars side by side.`);
 
   // 11. ByteTrack
-  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "02 From detections to speed" });
+  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "03 From detections to speed" });
   s.addText("MULTI-OBJECT TRACKING", { placeholder: "kicker" });
   s.addText("ByteTrack: predict, match, then rescue weak boxes", { placeholder: "title" });
   chips(s, ["TRACK"]);
@@ -458,7 +615,7 @@ The tricky part is that tracking has to survive the real world: missed detection
     T(s, b, { x, y: 5.68, w: cw11, h: 0.45, fontSize: 20, bold: true, color: NAVY, align: "center", valign: "middle" });
     T(s, l, { x, y: 6.12, w: cw11, h: 0.3, fontSize: 12, color: SLATE, align: "center" });
   });
-  s.addNotes(`[Arul | ~2 min]
+  s.addNotes(`[~2 min]
 We use ByteTrack, a tracker published at ECCV 2022. Every frame it runs four steps.
 Predict: each existing track has a Kalman filter, a constant-velocity motion model, that predicts where its box should be in the new frame.
 Match: we compare those predictions with YOLO's high-confidence detections using IoU, and the Hungarian algorithm finds the best one-to-one assignment.
@@ -467,7 +624,7 @@ Update: leftover detections start new tracks, and tracks unseen for about a seco
 On the MOT17 benchmark it reports 80.3 MOTA at 30 frames per second. In code it's one line from the supervision library.`);
 
   // 12. Homography
-  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "02 From detections to speed" });
+  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "03 From detections to speed" });
   s.addText("CAMERA GEOMETRY", { placeholder: "kicker" });
   s.addText("A homography turns pixels into metres", { placeholder: "title" });
   chips(s, ["MEASURE"]);
@@ -485,13 +642,13 @@ On the MOT17 benchmark it reports 80.3 MOTA at 30 frames per second. In code it'
   card(s, rx12, 4.8, rw12, 0.75, "FEF0C7");
   T(s, [{ text: "p′ ∝ H · p", options: { fontSize: 20, bold: true, breakLine: true } }, { text: "p = [x, y, 1]ᵀ  (homogeneous)", options: { fontSize: 12, color: SLATE } }], { x: rx12, y: 4.8, w: rw12, h: 0.75, color: INK, align: "center", valign: "middle" });
   T(s, dget("calib_note", "Zone calibrated from lane markings (assumed lane width)."), { x: MX, y: 5.85, w: W - 2 * MX, h: 0.6, fontSize: 13, color: SLATE });
-  s.addNotes(`[Arul | ~1.5 min]
+  s.addNotes(`[~1.5 min]
 Now we can follow a car in pixels, but speed needs metres. The camera's perspective is the problem: a car near the camera moves many pixels per metre, and a car far away moves only a few. The same speed would look different depending on where the car is.
 The fix is a homography: a 3×3 matrix that maps one plane to another. We click four points on the road that form a rectangle in the real world, for example lane markings, and tell the computer the real width and length of that rectangle in metres. Four point pairs give eight equations, enough to solve for H. OpenCV does this with getPerspectiveTransform.
 Apply H to every car's position and we get the bird's-eye view on the right, where one unit is one metre everywhere. ${dget("calib_note_spoken", "For our footage the real size comes from standard lane widths; on the real flyover you'd measure it on site.")}`);
 
   // 13. Speed
-  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "02 From detections to speed" });
+  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "03 From detections to speed" });
   s.addText("SPEED ESTIMATION", { placeholder: "kicker" });
   s.addText("Speed is metres travelled per second of video", { placeholder: "title" });
   chips(s, ["MEASURE"]);
@@ -510,13 +667,13 @@ Apply H to every car's position and we get the bird's-eye view on the right, whe
     if (i < 3) s.addImage({ data: await icon("LuArrowRight", HEX.accent5), x: x + ew + 0.1, y: 4.48, w: 0.3, h: 0.3, altText: "arrow" });
   }
   T(s, "Why a 1-second window? A single frame-to-frame step is a few cm and dominated by box jitter; averaging over ~30 frames gives a stable reading.", { x: MX, y: 5.8, w: W - 2 * MX, h: 0.6, fontSize: 14, color: SLATE });
-  s.addNotes(`[Arul | ~1.5 min]
+  s.addNotes(`[~1.5 min]
 With metres and a clock, speed is simple arithmetic. For each tracked vehicle we keep its position in the bird's-eye view over the last second of frames. Speed is the distance it moved divided by the time, and the time is the number of frames divided by the frame rate. Multiply metres per second by 3.6 to get kilometres per hour.
 Here's a real vehicle from our run: ${dget("ex_spoken", "it moved Δy metres over N frames")}.
 Why one second and not frame to frame? Between two consecutive frames a car moves maybe 50 centimetres, and the box edge wobbles by a similar amount. Averaging over about thirty frames smooths that out. The cost is that a new vehicle needs about half a second before we trust its speed.`);
 
   // 14. Errors
-  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "02 From detections to speed" });
+  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "03 From detections to speed" });
   s.addText("ERROR ANALYSIS", { placeholder: "kicker" });
   s.addText("Small measurement errors become wrong fines", { placeholder: "title" });
   chips(s, ["MEASURE"]);
@@ -537,24 +694,24 @@ Why one second and not frame to frame? Between two consecutive frames a car move
     await iconCircle(s, rx14, y, 0.55, mit[i][0], LIGHT, HEX.dk2);
     T(s, mit[i][1], { x: rx14 + 0.75, y: y - 0.05, w: rw14 - 0.75, h: 0.65, fontSize: 14, valign: "middle" });
   }
-  s.addNotes(`[Arul | ~1.5 min]
+  s.addNotes(`[~1.5 min]
 This is where it's easy to oversell, so let's be precise. Speed equals distance over time, so any error in distance or time goes straight into the speed.
 Box jitter of half a metre over one second adds about 1.8 km/h. If the calibration zone is 4% off, say 52 metres assumed when it's really 50, every speed is 4% high and a car at 60 reads 62.4. The worst is time. Our own demo clip runs at 25 frames per second, not 30. If the code had assumed 30, every speed is 20% high, and a legal driver at 60 shows as 72.
 Every one of these would fine someone who did nothing wrong. So we calibrate on site, read real timestamps, use the median over a window, drop tracks whose ID switched, and real systems add an enforcement tolerance above the limit.
-That's tracking and measurement. DPD will now close the loop.`);
+That's tracking and measurement. Next, we close the loop.`);
 
   // ===== Section 3 =====
-  pres.addSection({ title: "03 Closing the loop" });
-  s = pres.addSlide({ masterName: "SECTION", sectionTitle: "03 Closing the loop" });
-  s.addText("03", { placeholder: "number" });
+  pres.addSection({ title: "04 Closing the loop" });
+  s = pres.addSlide({ masterName: "SECTION", sectionTitle: "04 Closing the loop" });
+  s.addText("04", { placeholder: "number" });
   s.addText("Closing the loop", { placeholder: "title" });
-  s.addText("DPD  ·  Automation, deployment and live demo", { placeholder: "presenter" });
+  s.addText("Automation, deployment and live demo", { placeholder: "presenter" });
   chips(s, ["ACT"], true);
-  s.addNotes(`[DPD | ~10 s]
-Thanks, Arul. We now have a number, a speed in km/h. Automation is what happens next, without a human in the loop.`);
+  s.addNotes(`[~10 s]
+We now have a number, a speed in km/h. Automation is what happens next, without a human in the loop.`);
 
   // 15. Automation
-  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "03 Closing the loop" });
+  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "04 Closing the loop" });
   s.addText("AUTOMATION", { placeholder: "kicker" });
   s.addText("Automation turns a measurement into an action", { placeholder: "title" });
   chips(s, ["ACT"]);
@@ -581,13 +738,13 @@ Thanks, Arul. We now have a number, a speed in km/h. Automation is what happens 
       T(s, cols15[c][1][i], { x: xx + 0.4, y: yy, w: c15w / 2 - 0.45, h: 0.38, fontSize: 14, valign: "middle" });
     }
   }
-  s.addNotes(`[DPD | ~1.5 min]
+  s.addNotes(`[~1.5 min]
 Classic automation is sense, think, act. Vision is the sensing; this slide is the thinking and acting.
 For every tracked vehicle, every frame, a simple rule runs: is the speed above 60? If yes, we capture evidence: a snapshot with the box, the ID, the measured speed and the timestamp. We record it in a log, and then something acts on it: an alert, a "slow down" message on one of the flyover's display boards, or in a full system an e-challan.
 I want to be clear about scope. Our demo does the green column: the rule, the red box, the evidence images and the CSV log. A production system adds number-plate reading, a human reviewing every case before a fine is issued, and integration with the e-challan system. The human review is not optional. It's the answer to the 80% problem.`);
 
   // 16. Architecture
-  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "03 Closing the loop" });
+  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "04 Closing the loop" });
   s.addText("SYSTEM ARCHITECTURE", { placeholder: "kicker" });
   s.addText("The whole system is five open-source blocks", { placeholder: "title" });
   chips(s, STAGES);
@@ -612,13 +769,13 @@ I want to be clear about scope. Our demo does the green column: the rule, the re
     T(s, outs[i][1], { x: x + 0.8, y: 5.72, w: ow - 0.8, h: 0.33, fontSize: 15, bold: true, color: NAVY });
     T(s, outs[i][2], { x: x + 0.8, y: 6.05, w: ow - 0.8, h: 0.33, fontSize: 13, color: SLATE });
   }
-  s.addNotes(`[DPD | ~1 min]
+  s.addNotes(`[~1 min]
 Here's the full system as it runs in the demo. Frames come from the camera or a video file through OpenCV. YOLOv8 nano detects vehicles, ByteTrack from the supervision library assigns IDs, the homography and speed module converts positions to km/h, and the rule engine decides and records.
 The orange numbers are what we measured per frame on ${dget("cpu_label", "a laptop CPU")}. Detection is by far the most expensive stage; everything after it is almost free. That matters for the next slide.
 The outputs are a live annotated view, one evidence image per violating vehicle, and two CSV logs. Every block is open source, and the whole pipeline is about 200 lines of Python.`);
 
   // 17. Real-time
-  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "03 Closing the loop" });
+  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "04 Closing the loop" });
   s.addText("DEPLOYMENT", { placeholder: "kicker" });
   s.addText("Real time means a 33 ms budget per frame", { placeholder: "title" });
   card(s, MX, 1.9, 3.6, 2.15, NAVY);
@@ -643,13 +800,13 @@ The outputs are a live annotated view, one evidence image per violating vehicle,
     T(s, t, { x: rx17 + 0.3, y: 2.38 + i * 0.78, w: rw17 - 0.3, h: 0.68, fontSize: 14, valign: "middle" });
     s.addShape(pres.shapes.OVAL, { x: rx17, y: 2.38 + i * 0.78 + 0.27, w: 0.14, h: 0.14, fill: { color: AMBER }, line: { type: "none" }, objectName: "dot" });
   });
-  s.addNotes(`[DPD | ~1 min]
+  s.addNotes(`[~1 min]
 At 30 frames per second, everything has to finish in 33 milliseconds per frame, or the system falls behind the camera. On our machine we measured ${dget("fps_meas", "—")} frames per second end to end.
 The chart is the core trade-off, from Ultralytics' own benchmarks on CPU: the nano model takes about 80 ms per image at 37.3 mAP; the medium model is three times slower for about 13 points more mAP. For speed estimation, nano is accurate enough on cars, which are large, distinct objects.
 If you need more headroom: use a smaller input, process every second frame (speed is computed over a one-second window, so that still works), move to an edge GPU like a Jetson, or quantise the model to 8-bit integers.`);
 
   // 18. Limits
-  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "03 Closing the loop" });
+  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "04 Closing the loop" });
   s.addText("LIMITATIONS & ETHICS", { placeholder: "kicker" });
   s.addText("What this system cannot (yet) do", { placeholder: "title" });
   const lim = [
@@ -666,7 +823,7 @@ If you need more headroom: use a smaller input, process every second frame (spee
     T(s, lim[i][1], { x: x + 1.35, y: y + 0.38, w: lw - 1.7, h: 0.4, fontSize: 18, bold: true, color: NAVY });
     T(s, lim[i][2], { x: x + 1.35, y: y + 0.85, w: lw - 1.7, h: 1.05, fontSize: 14, color: SLATE });
   }
-  s.addNotes(`[DPD | ~1 min]
+  s.addNotes(`[~1 min]
 Four limits we want to state honestly.
 Environment: our model was trained mostly on daylight images. Night, rain and headlight glare all reduce confidence.
 Geometry: a flyover vibrates, and a camera that shifts by a few pixels breaks the calibration. Our method also assumes a flat road, and real roads curve and slope.
@@ -688,7 +845,7 @@ Now, let's see it run.`);
     T(s, a, { x: x + 0.25, y: 5.55, w: 3.3, h: 0.35, fontSize: 16, bold: true, color: WHITE });
     T(s, b, { x: x + 0.25, y: 5.88, w: 3.3, h: 0.3, fontSize: 13, color: "D0D5DD" });
   });
-  s.addNotes(`[DPD | 5-10 min | DEMO CHECKLIST]
+  s.addNotes(`[5-10 min | DEMO CHECKLIST]
 BEFORE THE TALK (see cv-automation-ppt/demo/README.md)
 - cd cv-automation-ppt/demo, then activate the venv (pip install -r requirements.txt done beforehand; no internet needed on stage)
 - Dry run: python speed_detection.py --show  (window opens, FPS > 10)
@@ -696,7 +853,7 @@ BEFORE THE TALK (see cv-automation-ppt/demo/README.md)
 - Backups ready in a video player: outputs/annotated.mp4 and outputs/demo_limit50/annotated.mp4
 
 DURING THE DEMO (Alt+Tab out of PowerPoint; these notes stay in Presenter View)
-1. python calibrate.py --check  -> show the yellow 4-point zone: "this is the homography from Arul's slide; 30 m along the road, 14 m across"
+1. python calibrate.py --check  -> show the yellow 4-point zone: "this is the homography from the homography slide; 30 m along the road, 14 m across"
 2. python speed_detection.py --show  (limit 60, the flyover limit)
    - Point at the HUD: FPS, vehicles, violations
    - SPACE pauses: show stable IDs and km/h labels; boxes only appear inside the zone (by design)
@@ -736,7 +893,7 @@ Then back to PowerPoint, next slide: Results.`);
   const vi = await addImg(s, path.join(DEMO, "violation_example.png"), vx, 3.75, vw, 2.2, { align: "left", valign: "top", alt: "Evidence snapshot of a vehicle above the speed limit" });
   T(s, dget("viol_caption", ""), { x: vx, y: vi.y + vi.h + 0.08, w: vw, h: 0.45, fontSize: 12, color: SLATE });
   source(s, dget("results_source", "Footage and calibration: see demo README."));
-  s.addNotes(`[DPD | ~1.5 min]
+  s.addNotes(`[~1.5 min]
 ${dget("results_spoken", "Summarise the numbers on this slide.")}
 Two honest caveats. First, this is public traffic-camera footage of an urban road, not the flyover, and the calibration uses assumed lane dimensions, so treat the absolute speeds as estimates. Second, we haven't measured ground-truth speeds with a radar, so this shows the pipeline works, not that it's certified-accurate. That validation is exactly what the real flyover system has been doing during its trial.`);
 
@@ -745,39 +902,56 @@ Two honest caveats. First, this is public traffic-camera footage of an urban roa
   s = pres.addSlide({ masterName: "DARK", sectionTitle: "Close" });
   s.addText("TAKEAWAYS", { placeholder: "kicker" });
   s.addText("Three things to remember", { placeholder: "title" });
-  const tk = [["Automation = perception + measurement + rule", "Detect, track, calibrate, decide: each a well-understood, open-source block. No training needed for vehicles."],
+  const tk = [["Every domain runs the same loop: see, decide, act", "Factories, farms, hospitals, roads: detect, track or classify, apply a rule, then act. Our speed system is ~200 lines of open-source blocks."],
     ["The model is the easy part", "Calibration, frame timing, night, rain and vibration decide whether the number is right."],
-    ["Precision before scale", "A false positive fines an innocent driver. Keep a human in the loop until accuracy is proven."]];
+    ["Precision before scale", "Just Walk Out, the flyover trial, 87% screening sensitivity: keep a human in the loop until accuracy is proven."]];
   tk.forEach(([a, b], i) => {
     const y = 1.95 + i * 1.5;
     T(s, "0" + (i + 1), { x: MX, y, w: 1.2, h: 1.0, fontSize: 48, bold: true, color: AMBER, valign: "top" });
     T(s, a, { x: MX + 1.4, y: y + 0.05, w: 10.5, h: 0.45, fontSize: 22, bold: true, color: WHITE });
     T(s, b, { x: MX + 1.4, y: y + 0.55, w: 10.5, h: 0.7, fontSize: 16, color: "D0D5DD" });
   });
-  s.addNotes(`[DPD | ~45 s]
+  s.addNotes(`[~45 s]
 Three things to take away.
-One: an automated vision system is a pipeline of perception, measurement and a rule. Each stage is well understood and available as open source; we didn't train anything.
+One: whether it's a weed, a tumour, a parcel or a speeding car, every system we showed runs the same loop: see, decide, act. Our speed system is that loop in about 200 lines of open-source code, with no training.
 Two: the model is the easy part. Whether the speed is right depends on calibration, frame timing and conditions like night, rain and vibration.
-Three: precision before scale. When the output is a fine, a false positive punishes an innocent person, so keep a human in the loop until the system has proven its accuracy, as the flyover trial is doing right now.`);
+Three: precision before scale. Amazon pulled Just Walk Out, the flyover cameras spent months in trial, and screening AI still misses about one case in eight. When the output affects a person, keep a human in the loop until accuracy is proven.`);
 
   // 22. References
   s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "Close" });
   s.addText("REFERENCES", { placeholder: "kicker" });
   s.addText("Sources", { placeholder: "title" });
-  const refs = [
-    "Jocher, G. et al. Ultralytics YOLOv8 (2023), docs.ultralytics.com: model benchmarks (mAP, params, CPU latency)",
-    "Zhang, Y. et al. ByteTrack: Multi-Object Tracking by Associating Every Detection Box. ECCV 2022",
-    "Lin, T.-Y. et al. Microsoft COCO: Common Objects in Context. ECCV 2014",
-    "Redmon, J. et al. You Only Look Once: Unified, Real-Time Object Detection. CVPR 2016",
-    "Hartley, R. & Zisserman, A. Multiple View Geometry in Computer Vision, 2nd ed. (homography, DLT)",
-    "Zivkovic, Z. Improved adaptive Gaussian mixture model for background subtraction (MOG2). ICPR 2004",
-    "Roboflow supervision: speed-estimation example (YOLO + ByteTrack + perspective transform), github.com/roboflow/supervision",
-    "Wikipedia: G. D. Naidu Elevated Expressway; The Week, 9 Oct 2025: Tamil Nadu's longest flyover opened",
-    "Lokmat Times: three killed after car hits parked truck near GD Naidu Flyover",
-    "BizzBuzz; The Hawk; NewKerala (2026): Coimbatore flyover AI speed cameras remain under trial",
+  const refsA = [
+    "Jocher, G. et al. Ultralytics YOLOv8 (2023), docs.ultralytics.com",
+    "Zhang, Y. et al. ByteTrack. ECCV 2022",
+    "Lin, T.-Y. et al. Microsoft COCO. ECCV 2014",
+    "Redmon, J. et al. You Only Look Once. CVPR 2016",
+    "Hartley & Zisserman. Multiple View Geometry, 2nd ed.",
+    "Zivkovic, Z. Adaptive GMM background subtraction (MOG2). ICPR 2004",
+    "Roboflow supervision: speed-estimation example, github.com/roboflow/supervision",
+    "Wikipedia: G. D. Naidu Elevated Expressway; The Week (9 Oct 2025)",
+    "Lokmat Times: three killed near GD Naidu Flyover (2025)",
+    "BizzBuzz; The Hawk; NewKerala (2026): flyover AI cameras in trial",
   ];
-  if (DATA.footage_ref) refs.push(DATA.footage_ref);
-  T(s, refs.map((r, i) => ({ text: r, options: { bullet: { type: "number" }, breakLine: i < refs.length - 1 } })), { x: MX, y: 1.9, w: W - 2 * MX, h: 4.9, fontSize: 14, color: INK, paraSpaceAfter: 6 });
+  if (DATA.footage_ref) refsA.push("Demo footage: cars.mp4, github.com/kraten/vehicle-speed-check");
+  const refsB = [
+    "BMW Group / Axis Communications: AIQX quality inspection case study",
+    "John Deere news release (18 Sep 2024): See & Spray 59% average savings",
+    "Grainews: Iowa State University See & Spray field study",
+    "US FDA: Artificial Intelligence-Enabled Medical Devices list (Dec 2025)",
+    "American Academy of Ophthalmology (2018): IDx-DR FDA clearance",
+    "Qure.ai qXR TB screening in India: press coverage",
+    "Supply Chain Dive (2022): Amazon Sparrow robot",
+    "CNBC; DeepLearning.AI The Batch (Apr 2024): Just Walk Out removed from Fresh",
+    "Claims Journal (Feb 2026): Waymo weekly paid rides",
+    "Onmanorama; Kerala Kaumudi (2023): Safe Kerala AI cameras",
+    "Swarajya (2025): DigiYatra at 24 airports",
+  ];
+  const colW = (W - 2 * MX - 0.5) / 2;
+  T(s, "Technical & deep dive", { x: MX, y: 1.85, w: colW, h: 0.35, fontSize: 14, bold: true, color: NAVY });
+  T(s, "Domains", { x: MX + colW + 0.5, y: 1.85, w: colW, h: 0.35, fontSize: 14, bold: true, color: NAVY });
+  T(s, refsA.map((r, i) => ({ text: r, options: { bullet: { type: "number" }, breakLine: i < refsA.length - 1 } })), { x: MX, y: 2.3, w: colW, h: 4.5, fontSize: 12, color: INK, paraSpaceAfter: 4 });
+  T(s, refsB.map((r, i) => ({ text: r, options: { bullet: { type: "number", numberStartAt: refsA.length + 1 }, breakLine: i < refsB.length - 1 } })), { x: MX + colW + 0.5, y: 2.3, w: colW, h: 4.5, fontSize: 12, color: INK, paraSpaceAfter: 4 });
   s.addNotes("Reference slide. No need to read out; leave up briefly if asked about sources.");
 
   // 23. Thank you
@@ -788,7 +962,7 @@ Three: precision before scale. When the output is a fine, a false positive punis
   T(s, "Computer Vision (20XW97)", { x: MX, y: 5.45, w: 8, h: 0.35, fontSize: 14, color: MUTED });
   s.addShape(pres.shapes.OVAL, { x: 9.3, y: 2.0, w: 3.0, h: 3.0, fill: { color: WHITE }, line: { color: RED, width: 18 }, objectName: "speed-sign" });
   s.addText("60", { x: 9.3, y: 2.0, w: 3.0, h: 3.0, fontSize: 92, bold: true, color: INK, align: "center", valign: "middle", margin: 0, isTextBox: true });
-  s.addNotes(`[DPD]
+  s.addNotes(`[closing]
 Thank you. We're happy to take questions, on the theory or on the code.
 Likely questions:
 - Why not radar? Radar is accurate but per-lane and expensive; one camera covers several lanes and also gives evidence images. Real systems often fuse both.

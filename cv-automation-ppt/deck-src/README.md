@@ -1,6 +1,6 @@
 # Deck source
 
-Regenerates `../CV_and_Automation.pptx` (26 slides, speaker notes included).
+Regenerates `../CV_and_Automation.pptx` (35 slides, speaker notes included).
 
 ```bash
 npm install
