@@ -1,0 +1,27 @@
+# Speed-detection demo configuration -- edit this file on the day.
+# All paths are relative to the demo/ folder.
+
+video: data/traffic.mp4        # default input (overridden by --source)
+model: yolov8n.pt              # Ultralytics weights (COCO-pretrained, auto-downloads if missing)
+confidence: 0.3                # YOLO confidence threshold
+iou: 0.5                       # YOLO NMS IoU threshold
+classes: [2, 3, 5, 7]          # COCO ids: car, motorcycle, bus, truck
+speed_limit_kmh: 60            # automation rule: speed > limit => violation (overridden by --limit)
+speed_window_s: 1.0            # speed is measured over the last ~1 s of a track
+output_dir: outputs
+
+# ---- Calibration (pixel -> metre) -------------------------------------------
+# SOURCE: 4 image points (x, y) in pixels, order: top-left, top-right,
+#         bottom-right, bottom-left. They outline a road patch that is a
+#         RECTANGLE on the ground (TARGET_WIDTH x TARGET_LENGTH metres).
+# Calibrated for data/traffic.mp4 (640x360): the patch spans 4 lanes
+# (4 x 3.5 m = 14 m) and 5 dash periods of the lane lines (5 x 6 m = 30 m,
+# 2 m dash + 4 m gap). Use calibrate.py to redo this for another camera
+# (e.g. the GD Naidu flyover) -- every camera view needs its own calibration.
+source:
+  - [203, 84]     # top-left
+  - [389, 84]     # top-right
+  - [583, 321]    # bottom-right
+  - [48, 321]     # bottom-left
+target_width_m: 14.0     # across the road
+target_length_m: 30.0    # along the road (this is what speed depends on)
