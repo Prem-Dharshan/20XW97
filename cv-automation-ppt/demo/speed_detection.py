@@ -5,7 +5,7 @@ transform (pixels -> metres) -> speed -> automation rule (flag > speed limit).
 Design follows Roboflow's supervision `examples/speed_estimation`.
 Usage:  python speed_detection.py --source data/traffic.mp4 [--show] [--save outputs/annotated.mp4] [--limit 60]
 """
-import argparse, csv, json, platform, time, warnings
+import argparse, csv, json, os, platform, sys, time, warnings
 from collections import Counter, defaultdict, deque
 from datetime import datetime
 from pathlib import Path
@@ -31,6 +31,11 @@ class ViewTransformer:
         if len(points) == 0:
             return points
         return cv2.perspectiveTransform(points.reshape(-1, 1, 2).astype(np.float32), self.m).reshape(-1, 2)
+
+
+def gui_available():
+    """cv2.imshow aborts the process on Linux without a display, so check first."""
+    return sys.platform in ("win32", "darwin") or bool(os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY"))
 
 
 def put_label(img, text, x, y, color, scale):
@@ -89,7 +94,12 @@ def main():
     vio_csv.writerow(["track_id", "class", "speed_kmh", "frame", "video_time_s", "snapshot_path"])
 
     writer = cv2.VideoWriter(args.save, cv2.VideoWriter_fourcc(*"mp4v"), fps, (w, h)) if args.save else None
-    show = args.show
+    show = args.show and gui_available()
+    if args.show and not show:
+        print("No display found -- running without --show")
+    if show:  # resizable window, initially ~1280 px wide (readable on a projector)
+        cv2.namedWindow("Speed detection", cv2.WINDOW_NORMAL)
+        cv2.resizeWindow("Speed detection", 1280, int(1280 * h / w))
     t_stage = {"detect": 0.0, "track": 0.0, "speed": 0.0, "annotate_io": 0.0}
     frame_idx, live_fps, t_start = 0, 0.0, time.perf_counter()
 
@@ -204,7 +214,7 @@ def main():
             "max": round(float(med.max()), 1) if len(med) else None},
         "speed_limit_kmh": limit, "violations": len(violators),
         "fraction_of_estimated_vehicles_violating": round(len(violators) / len(med), 3) if len(med) else None,
-        "processing_fps": round(frame_idx / total, 1), "cpu": f"{cpu} ({__import__('os').cpu_count()} threads)",
+        "processing_fps": round(frame_idx / total, 1), "cpu": f"{cpu} ({os.cpu_count()} threads)",
         "ms_per_frame": {k: round(1000 * v / max(frame_idx, 1), 1) for k, v in t_stage.items()},
         "calibration": {"source_px": cfg["source"], "target_width_m": cfg["target_width_m"],
                         "target_length_m": cfg["target_length_m"]},
