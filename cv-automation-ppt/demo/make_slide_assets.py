@@ -109,12 +109,18 @@ def main():
     # Tracked: zone + IDs + speeds
     img = up(raw)
     cv2.polylines(img, [poly * UP], True, YELLOW, 2)
-    for tid, cls, box, kmh, _, _ in states[key]:
+    taken = []  # label rectangles already drawn; a clashing label goes below its box instead
+    for tid, cls, box, kmh, _, _ in sorted(states[key], key=lambda r: r[2][0]):
         x1, y1, x2, y2 = box * UP
         lab = f"#{tid} {cls}" + (f" {kmh:.0f} km/h" if kmh is not None else "")
         col = RED if kmh is not None and kmh > cfg["speed_limit_kmh"] else GREEN
         cv2.rectangle(img, (x1, y1), (x2, y2), col, 2)
-        put_label(img, lab, x1, y1 - 2, col, 0.7)
+        (tw, th), base = cv2.getTextSize(lab, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 1)
+        ly = y1 - 2
+        if any(x1 < r[2] and r[0] < x1 + tw and ly - th - base < r[3] and r[1] < ly for r in taken):
+            ly = y2 + th + base + 4
+        taken.append((x1, ly - th - base - 2, x1 + tw + 4, ly))
+        put_label(img, lab, x1, ly, col, 0.7)
     cv2.imwrite(str(out / "frame_tracked.png"), img)
 
     # Homography before: source polygon with corner coordinates and real-world size

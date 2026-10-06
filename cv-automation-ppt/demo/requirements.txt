@@ -1,0 +1,7 @@
+# Tested on Python 3.13 (CPU only). Versions pinned for a reproducible live demo.
+ultralytics==8.4.173        # YOLOv8n; pulls in torch + torchvision
+supervision==0.30.7         # sv.ByteTrack is removed in supervision 0.31 -- keep this pin
+opencv-python==5.0.0.93     # GUI build (needed for --show / calibrate.py); do not mix with opencv-python-headless
+numpy>=1.26
+PyYAML>=6.0
+pillow>=10.0                # GIF export in make_slide_assets.py

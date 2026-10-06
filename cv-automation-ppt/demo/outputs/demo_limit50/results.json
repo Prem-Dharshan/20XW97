@@ -1,0 +1,59 @@
+{
+  "video": "traffic.mp4",
+  "resolution": [
+    640,
+    360
+  ],
+  "fps": 25.0,
+  "duration_s": 47.6,
+  "total_frames": 1190,
+  "track_ids_total": 35,
+  "unique_vehicles": 34,
+  "unique_vehicles_note": "tracks seen for >= 0.5 s inside the zone (shorter tracks = detector flicker)",
+  "unique_vehicles_by_class": {
+    "bus": 3,
+    "car": 30,
+    "truck": 1
+  },
+  "vehicles_with_speed_estimate": 34,
+  "speed_kmh_per_vehicle_median": {
+    "mean": 35.6,
+    "median": 37.0,
+    "p85": 47.0,
+    "min": 0.7,
+    "max": 55.6
+  },
+  "speed_limit_kmh": 50.0,
+  "violations": 5,
+  "fraction_of_estimated_vehicles_violating": 0.147,
+  "processing_fps": 24.3,
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz (4 threads)",
+  "ms_per_frame": {
+    "detect": 36.9,
+    "track": 1.4,
+    "speed": 0.1,
+    "annotate_io": 2.1
+  },
+  "calibration": {
+    "source_px": [
+      [
+        203,
+        84
+      ],
+      [
+        389,
+        84
+      ],
+      [
+        583,
+        321
+      ],
+      [
+        48,
+        321
+      ]
+    ],
+    "target_width_m": 14.0,
+    "target_length_m": 30.0
+  }
+}

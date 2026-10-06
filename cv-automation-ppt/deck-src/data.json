@@ -1,0 +1,54 @@
+{
+ "fps": 25,
+ "fps_meas": 24.7,
+ "n_vehicles": 34,
+ "median_speed": 37,
+ "n_viol": 0,
+ "n_viol50": 5,
+ "t_detect": 36.3,
+ "t_track": 1.4,
+ "t_speed": 0.1,
+ "res_label": "640×360 · 25 FPS",
+ "cpu_label": "a 4-thread CPU, no GPU",
+ "hist": {
+  "labels": [
+   "<20",
+   "20–30",
+   "30–40",
+   "40–50",
+   "50–60",
+   "60+"
+  ],
+  "under": [
+   0,
+   3,
+   13,
+   13,
+   0,
+   0
+  ],
+  "over": [
+   0,
+   0,
+   0,
+   0,
+   5,
+   0
+  ]
+ },
+ "ex_label": "track #7, peak reading",
+ "ex_dy": "16.2",
+ "ex_n": 25,
+ "ex_t": "1.0",
+ "ex_ms": "16.2",
+ "ex_kmh": "58.2",
+ "ex_verdict": "under 60 → no action",
+ "ex_spoken": "track number 7, a car, moved 16.2 metres in the bird's-eye view over 25 frames. At 25 frames per second that's 1.0 second, so 16.2 metres per second, times 3.6 is 58.2 km/h. That's under 60, so no action, but it's the car you'll see flagged when we lower the limit to 50 in the demo",
+ "calib_note": "Our calibration: 5 lane-dash periods × 6 m = 30 m along the road; 4 lanes × 3.5 m = 14 m across. Sanity check: buses waiting at the stop read 0–3 km/h.",
+ "calib_note_spoken": "For our footage the length comes from the lane dashes: 2 metre dash plus 4 metre gap, five periods, 30 metres. As a sanity check, buses waiting at the bus stop read 0 to 3 km/h. On the real flyover you'd measure the zone on site and validate with a car driven at a known speed.",
+ "results_title": "34 vehicles measured; none above 60 km/h on this clip",
+ "viol_caption": "Test run at a 50 km/h limit: car #7 at 58 km/h, saved automatically with timestamp.",
+ "results_source": "Footage: kraten/vehicle-speed-check (GitHub), urban road CCTV, 640×360 @ 25 FPS, 47.6 s. Calibrated from lane markings; no radar ground truth.",
+ "footage_ref": "Demo footage: cars.mp4, github.com/kraten/vehicle-speed-check (classroom use with attribution; no licence file)",
+ "results_spoken": "Here are the numbers from the full clip. We measured 34 vehicles: 30 cars, 3 buses and a truck. The median speed was 37 km/h and the 85th percentile 47, which makes sense for an urban road. At the 60 km/h limit, zero vehicles were flagged. We're reporting that as it is rather than tuning the calibration until something crosses 60. At a 50 km/h test limit, 5 vehicles were flagged, between 50 and 58 km/h, each with an automatic evidence snapshot like this one. The whole pipeline ran at 24.7 frames per second on a 4-thread CPU with no GPU, just enough to keep up with this 25 FPS camera."
+}

@@ -93,6 +93,8 @@ def main():
     vio_csv = csv.writer(vio_file)
     vio_csv.writerow(["track_id", "class", "speed_kmh", "frame", "video_time_s", "snapshot_path"])
 
+    if args.save:
+        Path(args.save).parent.mkdir(parents=True, exist_ok=True)
     writer = cv2.VideoWriter(args.save, cv2.VideoWriter_fourcc(*"mp4v"), fps, (w, h)) if args.save else None
     show = args.show and gui_available()
     if args.show and not show:

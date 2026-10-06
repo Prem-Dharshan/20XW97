@@ -1,0 +1,6 @@
+track_id,class,speed_kmh,frame,video_time_s,snapshot_path
+1,truck,51.3,13,0.52,outputs/demo_limit50/violations/track0001_frame00013.jpg
+2,car,50.6,31,1.24,outputs/demo_limit50/violations/track0002_frame00031.jpg
+5,car,50.1,158,6.32,outputs/demo_limit50/violations/track0005_frame00158.jpg
+7,car,58.2,198,7.92,outputs/demo_limit50/violations/track0007_frame00198.jpg
+11,car,55.0,385,15.40,outputs/demo_limit50/violations/track0011_frame00385.jpg
