@@ -170,7 +170,7 @@ We'll finish with a live demo.`);
     T(s, a, { x: x + 0.3, y: 2.95, w: pw - 0.5, h: 0.62, fontSize: 17, bold: true, color: NAVY });
     T(s, b, { x: x + 0.3, y: 3.6, w: pw - 0.5, h: 0.6, fontSize: 13, color: SLATE });
   });
-  T(s, "Deep dive (02–04): one pipeline, five stages, built and demoed on the GD Naidu Flyover", { x: MX, y: 4.55, w: W - 2 * MX, h: 0.35, fontSize: 15, bold: true, color: NAVY });
+  T(s, "Deep dive: the GD Naidu Flyover problem, then one pipeline in five stages (02–04), built and demoed", { x: MX, y: 4.55, w: W - 2 * MX, h: 0.35, fontSize: 15, bold: true, color: NAVY });
   const icons4 = ["LuScanSearch", "LuCrosshair", "LuRoute", "LuRuler", "LuSiren"];
   const desc4 = ["Image as numbers", "Find vehicles", "Keep identity", "Pixels → km/h", "Rule → evidence"];
   const bw4 = 2.05, g4 = 0.46, x04 = MX;
@@ -343,7 +343,8 @@ That brings us to our deep dive: one of these enforcement systems, on one road i
   });
 
   // 2. Problem
-  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "01 CV automation today" });
+  pres.addSection({ title: "Deep dive: the problem" });
+  s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "Deep dive: the problem" });
   s.addText("DEEP DIVE · THE PROBLEM", { placeholder: "kicker" });
   s.addText("Tamil Nadu's longest flyover has a speeding problem", { placeholder: "title" });
   // schematic of the flyover
@@ -377,7 +378,7 @@ The posted limit is 60 km/h. Within days of opening, a car coming off the flyove
 On an elevated road with no junctions, you lose your sense of speed, so 90 can feel like 60. A traffic officer with a radar gun can't cover 10 km. That's an automation problem, and the sensor that can solve it is a camera.`);
 
   // 3. Status check
-  s = pres.addSlide({ masterName: "DARK", sectionTitle: "01 CV automation today" });
+  s = pres.addSlide({ masterName: "DARK", sectionTitle: "Deep dive: the problem" });
   s.addText("DEEP DIVE · REALITY CHECK", { placeholder: "kicker" });
   s.addText("AI enforcement is already installed here, and still in trial", { placeholder: "title" });
   const st3 = [["44", "AI-enabled cameras along the flyover"], ["16", "digital display boards"], ["₹3 Cr", "approximate project cost"], ["3+ months", "in trial, no fines issued"]];
@@ -772,7 +773,7 @@ I want to be clear about scope. Our demo does the green column: the rule, the re
   s.addNotes(`[~1 min]
 Here's the full system as it runs in the demo. Frames come from the camera or a video file through OpenCV. YOLOv8 nano detects vehicles, ByteTrack from the supervision library assigns IDs, the homography and speed module converts positions to km/h, and the rule engine decides and records.
 The orange numbers are what we measured per frame on ${dget("cpu_label", "a laptop CPU")}. Detection is by far the most expensive stage; everything after it is almost free. That matters for the next slide.
-The outputs are a live annotated view, one evidence image per violating vehicle, and two CSV logs. Every block is open source, and the whole pipeline is about 200 lines of Python.`);
+The outputs are a live annotated view, one evidence image per violating vehicle, and two CSV logs. Every block is open source, and the whole pipeline is about 230 lines of Python.`);
 
   // 17. Real-time
   s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "04 Closing the loop" });
@@ -852,8 +853,8 @@ BEFORE THE TALK (see cv-automation-ppt/demo/README.md)
 - Plug in the charger (CPU slows on battery); close heavy apps
 - Backups ready in a video player: outputs/annotated.mp4 and outputs/demo_limit50/annotated.mp4
 
-DURING THE DEMO (Alt+Tab out of PowerPoint; these notes stay in Presenter View)
-1. python calibrate.py --check  -> show the yellow 4-point zone: "this is the homography from the homography slide; 30 m along the road, 14 m across"
+DURING THE DEMO (Alt+Tab out of the slides; these notes stay in Presenter View)
+1. python calibrate.py --check  -> show the yellow 4-point zone: "this is the 4-point zone from the homography slide: 30 m along the road, 14 m across"
 2. python speed_detection.py --show  (limit 60, the flyover limit)
    - Point at the HUD: FPS, vehicles, violations
    - SPACE pauses: show stable IDs and km/h labels; boxes only appear inside the zone (by design)
@@ -864,8 +865,8 @@ DURING THE DEMO (Alt+Tab out of PowerPoint; these notes stay in Presenter View)
 5. Q quits
 
 SAY
-"Same code, one parameter changed. Everything you saw is the five stages from the roadmap: about 200 lines of Python, no training."
-Then back to PowerPoint, next slide: Results.`);
+"Same code, one parameter changed. Everything you saw is the five stages from the roadmap: about 230 lines of Python, no training."
+Then back to the slides, next slide: Results.`);
 
   // 20. Results
   s = pres.addSlide({ masterName: "CONTENT", sectionTitle: "Demo & results" });
@@ -902,7 +903,7 @@ Two honest caveats. First, this is public traffic-camera footage of an urban roa
   s = pres.addSlide({ masterName: "DARK", sectionTitle: "Close" });
   s.addText("TAKEAWAYS", { placeholder: "kicker" });
   s.addText("Three things to remember", { placeholder: "title" });
-  const tk = [["Every domain runs the same loop: see, decide, act", "Factories, farms, hospitals, roads: detect, track or classify, apply a rule, then act. Our speed system is ~200 lines of open-source blocks."],
+  const tk = [["Every domain runs the same loop: see, decide, act", "Factories, farms, hospitals, roads: detect, track or classify, apply a rule, then act. Our speed system is ~230 lines of open-source blocks."],
     ["The model is the easy part", "Calibration, frame timing, night, rain and vibration decide whether the number is right."],
     ["Precision before scale", "Just Walk Out, the flyover trial, 87% screening sensitivity: keep a human in the loop until accuracy is proven."]];
   tk.forEach(([a, b], i) => {
@@ -913,7 +914,7 @@ Two honest caveats. First, this is public traffic-camera footage of an urban roa
   });
   s.addNotes(`[~45 s]
 Three things to take away.
-One: whether it's a weed, a tumour, a parcel or a speeding car, every system we showed runs the same loop: see, decide, act. Our speed system is that loop in about 200 lines of open-source code, with no training.
+One: whether it's a weed, a tumour, a parcel or a speeding car, every system we showed runs the same loop: see, decide, act. Our speed system is that loop in about 230 lines of open-source code, with no training.
 Two: the model is the easy part. Whether the speed is right depends on calibration, frame timing and conditions like night, rain and vibration.
 Three: precision before scale. Amazon pulled Just Walk Out, the flyover cameras spent months in trial, and screening AI still misses about one case in eight. When the output affects a person, keep a human in the loop until accuracy is proven.`);
 
