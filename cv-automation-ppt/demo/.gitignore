@@ -1,0 +1,5 @@
+# Large / local-only demo files
+.venv/
+data/*.mp4
+*.pt
+outputs/annotated.mp4
